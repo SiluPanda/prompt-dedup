@@ -3,6 +3,7 @@
 Detect near-duplicate LLM prompts via content hashing and similarity scoring.
 
 [![npm version](https://img.shields.io/npm/v/prompt-dedup.svg)](https://www.npmjs.com/package/prompt-dedup)
+[![npm downloads](https://img.shields.io/npm/dt/prompt-dedup.svg)](https://www.npmjs.com/package/prompt-dedup)
 [![license](https://img.shields.io/npm/l/prompt-dedup.svg)](https://github.com/SiluPanda/prompt-dedup/blob/master/LICENSE)
 [![node](https://img.shields.io/node/v/prompt-dedup.svg)](https://nodejs.org)
 
