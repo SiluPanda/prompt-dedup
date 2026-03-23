@@ -75,13 +75,17 @@ describe('DedupIndex', () => {
       expect(groups.length).toBe(2);
     });
 
-    it('duplicate groups have count > 1', () => {
+    it('exact duplicates do not inflate group member count', () => {
       const index = new DedupIndex();
       index.add('Prompt A.');
       index.add('Prompt A.');
-      const dupGroups = index.duplicateGroups();
-      expect(dupGroups.length).toBe(1);
-      expect(dupGroups[0].count).toBe(2);
+      const groups = index.groups();
+      expect(groups.length).toBe(1);
+      // Same hash added twice should NOT duplicate in members
+      expect(groups[0].count).toBe(1);
+      expect(groups[0].members.length).toBe(1);
+      // But duplicatesFound tracks the occurrence
+      expect(index.stats().duplicatesFound).toBe(1);
     });
   });
 
@@ -168,6 +172,27 @@ describe('DedupIndex', () => {
       // Stats should be reasonable
       expect(restored.size()).toBe(2);
       expect(restored.groups().length).toBe(2);
+    });
+
+    it('round-trip preserves totalAdded and duplicatesFound', () => {
+      const index = new DedupIndex();
+      index.add('Alpha prompt.');
+      index.add('Beta prompt.');
+      index.add('Alpha prompt.'); // exact dup
+
+      const origStats = index.stats();
+      expect(origStats.totalAdded).toBe(3);
+      expect(origStats.duplicatesFound).toBe(1);
+
+      const serialized = index.serialize();
+      expect(serialized.totalAdded).toBe(3);
+      expect(serialized.duplicatesFound).toBe(1);
+
+      const restored = DedupIndex.deserialize(serialized);
+      const restoredStats = restored.stats();
+      expect(restoredStats.totalAdded).toBe(3);
+      expect(restoredStats.duplicatesFound).toBe(1);
+      expect(restoredStats.deduplicationRate).toBeCloseTo(1 / 3);
     });
   });
 

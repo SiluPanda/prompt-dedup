@@ -51,7 +51,7 @@ export class DedupIndex {
     if (existing) {
       this.duplicatesFound++;
       const groupId = this.groupManager.getGroupForHash(normalizedHash)!;
-      this.groupManager.addToGroup(groupId, normalizedHash);
+      // Hash is already a member of its group — don't re-add (would duplicate in members array)
 
       return {
         hash: normalizedHash,
@@ -265,6 +265,8 @@ export class DedupIndex {
       threshold: this.options.threshold,
       entries,
       groups: this.groupManager.getAllGroups(),
+      totalAdded: this.totalAdded,
+      duplicatesFound: this.duplicatesFound,
     };
   }
 
@@ -297,10 +299,15 @@ export class DedupIndex {
     // Restore eviction order
     index.evictionManager.restore(data.entries as IndexEntry[]);
 
-    // Restore counters
-    index.totalAdded = data.entries.length;
-    const totalMembers = data.groups.reduce((sum, g) => sum + g.count, 0);
-    index.duplicatesFound = totalMembers - data.groups.length;
+    // Restore counters (use stored values if available, fall back to computed)
+    if (data.totalAdded !== undefined) {
+      index.totalAdded = data.totalAdded;
+      index.duplicatesFound = data.duplicatesFound ?? 0;
+    } else {
+      index.totalAdded = data.entries.length;
+      const totalMembers = data.groups.reduce((sum, g) => sum + g.count, 0);
+      index.duplicatesFound = totalMembers - data.groups.length;
+    }
 
     return index;
   }
