@@ -177,6 +177,8 @@ export interface SerializedIndex {
     addedAt: string;
   }>;
   groups: DedupGroup[];
+  totalAdded?: number;
+  duplicatesFound?: number;
 }
 
 /** Internal index entry. */
