@@ -61,7 +61,7 @@ export interface HashResult {
 
 /** Configuration for similarity scoring. */
 export interface SimilarityOptions extends NormalizeOptions {
-  /** Weights for the composite similarity score. Must sum to 1.0. */
+  /** Weights for the composite similarity score. Normalized by total weight. */
   weights?: {
     jaccard?: number;
     shingle?: number;
