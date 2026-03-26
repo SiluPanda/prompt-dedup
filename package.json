@@ -1,6 +1,6 @@
 {
   "name": "prompt-dedup",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Detect near-duplicate prompts via content hashing and similarity",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

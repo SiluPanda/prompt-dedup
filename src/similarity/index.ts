@@ -45,12 +45,11 @@ export function similarity(
   const editDistance = editDistanceSimilarity(normalizedA, normalizedB, maxEditDistanceLength);
   const structural = structuralSimilarity(textA, textB);
 
-  // Compute weighted composite score
-  const score =
-    weights.jaccard * jaccard +
-    weights.shingle * shingle +
-    weights.edit * editDistance +
-    weights.structure * structural;
+  // Compute weighted composite score, normalized by total weight
+  const totalWeight = weights.jaccard + weights.shingle + weights.edit + weights.structure;
+  const score = totalWeight > 0
+    ? (weights.jaccard * jaccard + weights.shingle * shingle + weights.edit * editDistance + weights.structure * structural) / totalWeight
+    : 0;
 
   const durationMs = performance.now() - start;
 

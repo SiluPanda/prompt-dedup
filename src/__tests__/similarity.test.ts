@@ -148,6 +148,36 @@ describe('similarity (composite)', () => {
     expect(typeof result.isDuplicate).toBe('boolean');
     expect(result.threshold).toBe(0.99);
   });
+
+  it('normalizes score by total weight when custom weights sum > 1.0', () => {
+    // Partial custom weights get spread over defaults, total > 1.0
+    const result = similarity(
+      'You are a helpful assistant.',
+      'You are a helpful assistant.',
+      { weights: { jaccard: 0.5 } },
+    );
+    expect(result.score).toBeLessThanOrEqual(1.0);
+    expect(result.score).toBeGreaterThanOrEqual(0.0);
+  });
+
+  it('normalizes score for arbitrary large custom weights', () => {
+    const result = similarity(
+      'You are a helpful assistant. Answer questions.',
+      'You are a helpful assistant. Answer questions clearly.',
+      { weights: { jaccard: 2.0, shingle: 2.0, edit: 1.0, structure: 1.0 } },
+    );
+    expect(result.score).toBeLessThanOrEqual(1.0);
+    expect(result.score).toBeGreaterThanOrEqual(0.0);
+  });
+
+  it('returns 0 when all weights are zero', () => {
+    const result = similarity(
+      'You are a helpful assistant.',
+      'You are a helpful assistant.',
+      { weights: { jaccard: 0, shingle: 0, edit: 0, structure: 0 } },
+    );
+    expect(result.score).toBe(0);
+  });
 });
 
 describe('isDuplicate', () => {
